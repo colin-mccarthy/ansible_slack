@@ -1,22 +1,26 @@
 ---
 - hosts: localhost
-- name: Status of Apache
-    command: service httpd status
-    register: output
+  gather_facts: no
+
     
   vars:
     - slack_domain: yourusername.slack.com
-    - slack_token: thetoken/generatedby/slack    
+    - slack_token: thetoken/generatedby/slack   
+    
+  tasks:
+    - name: Status of Apache
+      command: service httpd status
+      register: output
 
-- name: Send notification to Slack
-     module: slack
-     token: "{{ slack_token }}"
-     channel: "#ansible"
-     msg: "Status of apache on host {{ ansible_hostname }} is {{ output.stdout_lines }}"
+    - name: Send notification to Slack
+      slack:
+        token: "{{ slack_token }}"
+        channel: "#ansible"
+        msg: "Status of apache on host {{ ansible_hostname }} is {{ output.stdout_lines }}"
      
-- name: Send a message with a link using Slack markup
-  slack:
-    token: "{{ slack_token }}"
-    msg: We sent this message using <https://www.ansible.com|Ansible>!     
+   - name: Send a message with a link using Slack markup
+     slack:
+       token: "{{ slack_token }}"
+       msg: We sent this message using <https://www.ansible.com|Ansible>!     
     
     
